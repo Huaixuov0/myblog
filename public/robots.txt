@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://myblog-lyart.vercel.app/sitemap-index.xml
+Sitemap: https://myblog-chi-lilac.vercel.app/sitemap-index.xml
