@@ -16,8 +16,8 @@ export const GET: APIRoute = async (context) => {
     }));
 
   return rss({
-    title: "一号博客",
-    description: "一号主人的技术博客 - 信息安全、Web开发与更多",
+    title: "Huaixuov0",
+    description: "Huaixuov0 的技术博客",
     site: context.site || "https://your-blog.vercel.app",
     items,
     customData: `<language>zh-CN</language>`,

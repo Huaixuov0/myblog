@@ -10,7 +10,7 @@ export interface Props {
   ogImage?: string;
 }
 
-const { title, description = "一号主人的技术博客" } = Astro.props;
+const { title, description = "Huaixuov0 的技术博客" } = Astro.props;
 const currentPath = Astro.url.pathname;
 ---
 
@@ -19,12 +19,12 @@ const currentPath = Astro.url.pathname;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title} | 一号博客</title>
+    <title>{title} | Huaixuov0</title>
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <link rel="alternate" type="application/rss+xml" title="一号博客 RSS" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Huaixuov0 RSS" href="/rss.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
