@@ -1,45 +1,235 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import GiscusComments from "../../components/GiscusComments.astro";
 import { formatDate } from "../../utils/date";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog");
-  return posts.map((post) => ({
+  const posts = (await getCollection("blog")).sort(
+    (a, b) => b.data.date.getTime() - a.data.date.getTime()
+  );
+
+  return posts.map((post, i) => ({
     params: { slug: post.slug },
-    props: { post },
+    props: {
+      post,
+      newerPost: posts[i - 1] || null,
+      olderPost: posts[i + 1] || null,
+    },
   }));
 }
 
-const { post } = Astro.props;
-const { Content } = await post.render();
+const { post, newerPost, olderPost } = Astro.props;
+const { Content, headings } = await post.render();
+const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 ---
 
 <BaseLayout title={post.data.title} description={post.data.excerpt || post.data.title}>
-  <article style="margin-top: 2.5rem;">
-    <header class="article-header">
-      <h1 class="article-title">{post.data.title}</h1>
-      <div class="article-meta">
-        <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
-        <span>&middot;</span>
-        <span>{post.data.readingTime || "5 min"} 阅读</span>
-      </div>
-      {
-        post.data.tags && post.data.tags.length > 0 && (
-          <div class="article-tags">
-            {post.data.tags.map((tag: string) => (
-              <a href={`/tags?tag=${tag}`}>{tag}</a>
-            ))}
-          </div>
-        )
-      }
-    </header>
+  <article style="margin-top: 2.5rem;" class="article-layout">
+    {tocHeadings.length > 3 && (
+      <aside class="toc" id="toc">
+        <h3>目录</h3>
+        <ul>
+          {tocHeadings.map((h) => (
+            <li class={`toc-depth-${h.depth}`}>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    )}
 
-    <div class="article-content">
-      <Content />
+    <div class="article-main">
+      <header class="article-header">
+        <h1 class="article-title">{post.data.title}</h1>
+        <div class="article-meta">
+          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+          <span>&middot;</span>
+          <span>约 {Math.max(1, Math.round(post.body?.length / 500 || 3))} 分钟</span>
+        </div>
+        {
+          post.data.tags && post.data.tags.length > 0 && (
+            <div class="article-tags">
+              {post.data.tags.map((tag: string) => (
+                <a href={`/tags?tag=${tag}`}>{tag}</a>
+              ))}
+            </div>
+          )
+        }
+      </header>
+
+      <div class="article-content">
+        <Content />
+      </div>
+
+      <nav class="post-nav">
+        {olderPost ? (
+          <a href={`/blog/${olderPost.slug}`} class="post-nav-item post-nav-prev">
+            <span class="post-nav-label">上一篇</span>
+            <span class="post-nav-title">{olderPost.data.title}</span>
+          </a>
+        ) : <span class="post-nav-placeholder" />}
+        {newerPost ? (
+          <a href={`/blog/${newerPost.slug}`} class="post-nav-item post-nav-next">
+            <span class="post-nav-label">下一篇</span>
+            <span class="post-nav-title">{newerPost.data.title}</span>
+          </a>
+        ) : <span class="post-nav-placeholder" />}
+      </nav>
     </div>
   </article>
-
-  <GiscusComments />
 </BaseLayout>
+
+<style>
+  .article-layout {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+
+  .toc {
+    position: sticky;
+    top: 80px;
+    width: 200px;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+
+  .toc h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .toc ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-left: 2px solid var(--color-border);
+  }
+
+  .toc li {
+    margin: 0;
+  }
+
+  .toc li a {
+    display: block;
+    padding: 0.3rem 0 0.3rem 0.75rem;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    margin-left: -2px;
+    line-height: 1.4;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .toc li a:hover,
+  .toc li a.active {
+    color: var(--color-accent);
+    border-left-color: var(--color-accent);
+  }
+
+  .toc-depth-3 a {
+    padding-left: 1.5rem;
+    font-size: 0.8rem;
+  }
+
+  .article-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .post-nav-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, background 0.15s;
+    max-width: 48%;
+  }
+
+  .post-nav-item:hover {
+    border-color: var(--color-accent);
+    background: var(--color-bg-secondary);
+  }
+
+  .post-nav-item:hover .post-nav-title {
+    color: var(--color-accent);
+  }
+
+  .post-nav-next {
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .post-nav-placeholder {
+    max-width: 48%;
+  }
+
+  .post-nav-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .post-nav-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-text);
+    transition: color 0.15s;
+  }
+
+  @media (max-width: 900px) {
+    .article-layout {
+      flex-direction: column;
+    }
+    .toc {
+      position: relative;
+      top: 0;
+      width: 100%;
+      max-height: none;
+      order: 2;
+      margin-bottom: 1.5rem;
+    }
+    .article-main {
+      order: 1;
+    }
+  }
+</style>
+
+<script>
+  // Highlight current TOC item on scroll
+  const headings = document.querySelectorAll('.article-content h2, .article-content h3');
+  const tocLinks = document.querySelectorAll('.toc a');
+  if (headings.length && tocLinks.length) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            tocLinks.forEach((link) => {
+              link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+            });
+          }
+        });
+      },
+      { rootMargin: '-80px 0px -70% 0px' }
+    );
+    headings.forEach((h) => observer.observe(h));
+  }
+</script>

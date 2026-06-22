@@ -144,6 +144,28 @@ pre code {
   font-size: inherit;
 }
 
+/* Shiki dual-theme: light/dark code blocks */
+.astro-code {
+  padding: 1rem 1.25rem !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--color-border) !important;
+  font-size: 0.875rem !important;
+  line-height: 1.6 !important;
+  overflow-x: auto;
+}
+
+html:not(.dark) .astro-code,
+html:not(.dark) .astro-code span {
+  background-color: #f6f8fa !important;
+  color: #24292e !important;
+}
+
+html.dark .astro-code,
+html.dark .astro-code span {
+  background-color: #0d1117 !important;
+  color: #c9d1d9 !important;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

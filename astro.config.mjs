@@ -1,13 +1,18 @@
 import { defineConfig } from "astro/config";
+import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
-  site: "https://your-blog.vercel.app",
+  site: "https://myblog-lyart.vercel.app",
+  integrations: [sitemap()],
   build: {
     inlineStylesheets: "auto",
   },
   markdown: {
     shikiConfig: {
-      theme: "github-dark",
+      themes: {
+        light: "github-light",
+        dark: "github-dark",
+      },
       wrap: true,
     },
   },
