@@ -1,0 +1,47 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="关于我">
+  <section style="margin-top: 3rem;">
+    <div class="about-hero">
+      <div class="about-avatar">🛡️</div>
+      <div>
+        <div class="about-name">一号主人</div>
+        <p class="about-bio">信息安全专业 · 大二在读</p>
+      </div>
+    </div>
+
+    <div style="max-width: 600px; line-height: 1.8; color: var(--color-text-secondary);">
+      <h2 style="font-size: 1.2rem; margin-bottom: 0.75rem; color: var(--color-text);">关于我</h2>
+      <p>
+        信息安全专业大二学生，热爱技术、乐于折腾。
+        目前在学 Web 开发、网络安全、CTF 等方向。
+      </p>
+      <p>
+        这个博客记录我的学习笔记、项目心得和日常思考。
+        希望多年后回头看，能看见自己成长的轨迹。
+      </p>
+
+      <h2 style="font-size: 1.2rem; margin-top: 2rem; margin-bottom: 0.75rem; color: var(--color-text);">技术栈</h2>
+      <ul style="list-style: none; padding-left: 0; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+        <li class="tag-badge">Python</li>
+        <li class="tag-badge">HTML/CSS</li>
+        <li class="tag-badge">JavaScript</li>
+        <li class="tag-badge">网络安全</li>
+        <li class="tag-badge">CTF</li>
+        <li class="tag-badge">Linux</li>
+        <li class="tag-badge">Astro</li>
+      </ul>
+
+      <h2 style="font-size: 1.2rem; margin-top: 2rem; margin-bottom: 0.75rem; color: var(--color-text);">联系方式</h2>
+      <p>
+        <a href="https://github.com" target="_blank" rel="noopener">
+          GitHub
+        </a>
+        <span style="margin: 0 0.5rem; color: var(--color-border);">|</span>
+        <a href="/rss.xml">RSS 订阅</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>

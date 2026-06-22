@@ -1,0 +1,62 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const posts = await getCollection("blog");
+const recentPosts = posts
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 5);
+---
+
+<BaseLayout title="首页" description="一号主人的技术博客 - 信息安全、Web开发与更多">
+  <section style="margin-top: 3rem; margin-bottom: 2.5rem;">
+    <h1 style="font-size: 2.25rem; margin-bottom: 0.75rem; letter-spacing: -0.03em;">
+      嘿，我是一号的主人 👋
+    </h1>
+    <p style="font-size: 1.1rem; color: var(--color-text-secondary); max-width: 560px; line-height: 1.7;">
+      信息安全专业大二学生。这里记录我的学习、思考和踩坑笔记。
+    </p>
+    <nav style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+      <a href="/blog" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 1.25rem; background: var(--color-accent); color: white; border-radius: 8px; font-weight: 500; font-size: 0.9rem;">
+        阅读博客
+      </a>
+      <a href="/about" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 1.25rem; background: var(--color-bg-secondary); color: var(--color-text-secondary); border-radius: 8px; font-weight: 500; font-size: 0.9rem; border: 1px solid var(--color-border);">
+        关于我
+      </a>
+    </nav>
+  </section>
+
+  <section>
+    <h2 style="font-size: 1.3rem; margin-bottom: 1rem;">
+      最新文章
+      { recentPosts.length > 0 && <a href="/blog" style="font-size: 0.85rem; font-weight: 400; margin-left: 0.75rem;">查看全部 &rarr;</a> }
+    </h2>
+
+    {
+      recentPosts.length === 0 ? (
+        <p class="empty-state" style="text-align: left; padding: 1rem 0;">还没有文章，马上开始写第一篇！</p>
+      ) : (
+        <ul class="blog-list">
+          {recentPosts.map((post) => (
+            <li class="blog-item">
+              <a href={`/blog/${post.slug}`}>
+                <div class="blog-item-title">{post.data.title}</div>
+                <div class="blog-item-meta">
+                  <time datetime={post.data.date.toISOString()}>{post.data.date.toISOString().slice(0, 10)}</time>
+                  {post.data.tags && post.data.tags.length > 0 && (
+                    <span>{post.data.tags.join(" · ")}</span>
+                  )}
+                </div>
+                {post.data.excerpt && (
+                  <p style="font-size: 0.9rem; color: var(--color-text-secondary); margin-top: 0.4rem;">
+                    {post.data.excerpt}
+                  </p>
+                )}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </section>
+</BaseLayout>

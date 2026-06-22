@@ -1,0 +1,45 @@
+<!-- 
+  Giscus 评论系统
+  替换下面的 repo 为你的 GitHub 仓库名，格式：用户名/仓库名
+  需要仓库已安装 Giscus App: https://github.com/apps/giscus
+-->
+<div class="comments-section" id="comments">
+  <h3>评论</h3>
+  <div id="giscus-container" style="margin-top: 1rem;">
+    <p style="color: var(--color-text-muted); font-size: 0.9rem;">
+      评论功能需要你配置 GitHub 仓库后启用。
+      <br />
+      请参考 <a href="https://giscus.app/zh-CN" target="_blank">Giscus 文档</a> 进行配置。
+    </p>
+  </div>
+</div>
+
+<script is:inline>
+  // TODO: 替换为你的实际仓库配置
+  // 配置步骤:
+  // 1. Fork 或 push 你的博客代码到 GitHub 公开仓库
+  // 2. 在仓库安装 Giscus App: https://github.com/apps/giscus
+  // 3. 开启 Discussions 功能 (Settings → General → Features → Discussions)
+  // 4. 访问 https://giscus.app/zh-CN 获取配置
+  //
+  // 完成后，取消下面代码的注释并填入你的 repo 信息:
+  //
+  // (function () {
+  //   const script = document.createElement("script");
+  //   script.src = "https://giscus.app/client.js";
+  //   script.setAttribute("data-repo", "你的用户名/你的仓库名");
+  //   script.setAttribute("data-repo-id", "你的仓库ID");
+  //   script.setAttribute("data-category", "Announcements");
+  //   script.setAttribute("data-category-id", "你的分类ID");
+  //   script.setAttribute("data-mapping", "pathname");
+  //   script.setAttribute("data-strict", "0");
+  //   script.setAttribute("data-reactions-enabled", "1");
+  //   script.setAttribute("data-emit-metadata", "0");
+  //   script.setAttribute("data-input-position", "top");
+  //   script.setAttribute("data-theme", document.documentElement.classList.contains("dark") ? "dark" : "light");
+  //   script.setAttribute("data-lang", "zh-CN");
+  //   script.crossOrigin = "anonymous";
+  //   script.async = true;
+  //   document.getElementById("giscus-container").appendChild(script);
+  // })();
+</script>

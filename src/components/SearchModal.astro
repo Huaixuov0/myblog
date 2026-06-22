@@ -1,0 +1,93 @@
+<div class="search-overlay" id="search-overlay">
+  <button class="search-close" onclick="document.getElementById('search-overlay')?.classList.remove('open')" aria-label="关闭搜索">
+    &times;
+  </button>
+  <div class="search-modal">
+    <input
+      type="text"
+      class="search-input"
+      id="search-input"
+      placeholder="搜索文章... (Esc 关闭)"
+      autocomplete="off"
+    />
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>
+
+<script>
+  // Build search index from all blog posts
+  const searchIndex: { title: string; slug: string; date: string; tags: string[]; excerpt: string }[] = [];
+
+  // Fetch all posts metadata at build/runtime
+  async function buildIndex() {
+    try {
+      const res = await fetch("/search-index.json");
+      if (!res.ok) return;
+      const data = await res.json();
+      searchIndex.push(...data);
+    } catch {}
+  }
+
+  const overlay = document.getElementById("search-overlay")!;
+  const input = document.getElementById("search-input") as HTMLInputElement;
+  const results = document.getElementById("search-results")!;
+
+  // Open with Ctrl+K
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+      e.preventDefault();
+      overlay.classList.add("open");
+      input.focus();
+    }
+    if (e.key === "Escape" && overlay.classList.contains("open")) {
+      overlay.classList.remove("open");
+    }
+  });
+
+  // Close on overlay click
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.classList.remove("open");
+  });
+
+  // Search logic
+  input.addEventListener("input", () => {
+    const query = input.value.trim().toLowerCase();
+    if (!query) {
+      results.innerHTML = "";
+      return;
+    }
+
+    const filtered = searchIndex.filter((post) => {
+      const searchTarget = `${post.title} ${post.tags.join(" ")} ${post.excerpt}`.toLowerCase();
+      return searchTarget.includes(query);
+    });
+
+    if (filtered.length === 0) {
+      results.innerHTML = '<div class="search-empty">没有找到相关文章</div>';
+      return;
+    }
+
+    results.innerHTML = filtered
+      .slice(0, 10)
+      .map(
+        (post) => `
+        <div class="search-result-item">
+          <a href="/blog/${post.slug}">
+            <div class="search-result-title">${highlight(post.title, query)}</div>
+            <div class="search-result-excerpt">${highlight(post.excerpt, query)}</div>
+          </a>
+        </div>`
+      )
+      .join("");
+  });
+
+  function highlight(text: string, query: string): string {
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return text.replace(new RegExp(`(${escaped})`, "gi"), "<mark>$1</mark>");
+  }
+
+  // Build index when overlay first opens
+  overlay.addEventListener("transitionstart", buildIndex, { once: true });
+  overlay.addEventListener("animationstart", buildIndex, { once: true });
+  buildIndex();
+</script>

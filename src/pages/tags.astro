@@ -1,0 +1,71 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const posts = await getCollection("blog");
+
+// Gather all tags with counts
+const tagMap = new Map<string, number>();
+for (const post of posts) {
+  if (post.data.tags) {
+    for (const tag of post.data.tags) {
+      tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+    }
+  }
+}
+const tags = Array.from(tagMap.entries()).sort((a, b) => b[1] - a[1]);
+
+// Filter by tag if query parameter present
+const url = new URL(Astro.request.url);
+const activeTag = url.searchParams.get("tag");
+const filteredPosts = activeTag
+  ? posts.filter((p) => p.data.tags?.includes(activeTag))
+  : [];
+---
+
+<BaseLayout title={activeTag ? `标签: ${activeTag}` : "标签"}>
+  <h1 class="page-title">标签</h1>
+
+  <div class="tags-cloud">
+    {tags.map(([tag, count]) => (
+      <a
+        href={`/tags?tag=${tag}`}
+        class="tag-badge"
+        style={activeTag === tag ? "background: var(--color-accent); color: white; border-color: var(--color-accent);" : ""}
+      >
+        {tag} <span class="tag-count">{count}</span>
+      </a>
+    ))}
+  </div>
+
+  {
+    activeTag && (
+      <section style="margin-top: 2rem;">
+        <h2 style="font-size: 1.1rem; margin-bottom: 0.75rem;">
+          标签为 "{activeTag}" 的文章 ({filteredPosts.length})
+        </h2>
+        {
+          filteredPosts.length === 0 ? (
+            <p style="color: var(--color-text-muted);">没有找到相关文章</p>
+          ) : (
+            <ul class="blog-list">
+              {filteredPosts.map((post) => (
+                <li class="blog-item">
+                  <a href={`/blog/${post.slug}`}>
+                    <div class="blog-item-title">{post.data.title}</div>
+                    <div class="blog-item-meta">
+                      <time>{post.data.date.toISOString().slice(0, 10)}</time>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+        <p style="margin-top: 1rem;">
+          <a href="/tags" style="font-size: 0.9rem;">&larr; 查看所有标签</a>
+        </p>
+      </section>
+    )
+  }
+</BaseLayout>

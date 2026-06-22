@@ -1,0 +1,52 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const posts = await getCollection("blog");
+const sortedPosts = posts.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+---
+
+<BaseLayout title="博客" description="所有文章">
+  <h1 class="page-title">博客</h1>
+
+  {
+    sortedPosts.length === 0 ? (
+      <div class="empty-state">
+        <p>还没有文章</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+          在 <code>src/content/blog/</code> 目录下创建 <code>.md</code> 文件开始写作。
+        </p>
+      </div>
+    ) : (
+      <ul class="blog-list">
+        {sortedPosts.map((post) => (
+          <li class="blog-item">
+            <a href={`/blog/${post.slug}`}>
+              <div class="blog-item-title">{post.data.title}</div>
+              <div class="blog-item-meta">
+                <time datetime={post.data.date.toISOString()}>{post.data.date.toISOString().slice(0, 10)}</time>
+                {post.data.tags && post.data.tags.length > 0 && (
+                  <span>{post.data.tags.join(" · ")}</span>
+                )}
+              </div>
+              {post.data.excerpt && (
+                <p style="font-size:0.9rem; color:var(--color-text-secondary); margin-top:0.35rem;">
+                  {post.data.excerpt}
+                </p>
+              )}
+            </a>
+            {post.data.tags && post.data.tags.length > 0 && (
+              <div class="blog-item-tags">
+                {post.data.tags.map((tag: string) => (
+                  <a href={`/tags?tag=${tag}`}><span>{tag}</span></a>
+                ))}
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</BaseLayout>
